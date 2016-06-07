@@ -1,86 +1,46 @@
-var canvas;
-var ctx;
+var app = app || {};
 
-const WIDTH = 800;
-const HEIGHT = 800;
+(function (planetarium) {
 
-var planetArray = [];
-//todo : tova trqbva da se mahne ottuk
+    var planetPositionX, planetPositionY, planetVelocityX, planetVelocityY;
 
-var mouseDown = 0;
+    $('#space').on('mousedown mouseup', function mouseState(event) {
+        if (event.type == "mousedown") {
+            planetPositionX = event.clientX;
+            planetPositionY = event.clientY;
+        }
+        else if (event.type == "mouseup") {
+            planetVelocityX = event.clientX;
+            planetVelocityY = event.clientY;
 
-document.body.onmousedown = function () {
-    mouseDown = 1;
-};
+            addPlanet();
+        }
+    });
 
-document.body.onmouseup = function () {
-    mouseDown = 0;
-};
+    function addPlanet() {
+        var rad = $("#radius").val();
+        var mas = $("#mass").val();
+        if (rad > 0 && mas > 0) {
+            planetarium.planetArray.push(new planetarium.Planet(planetPositionX, planetPositionY, (planetVelocityX - planetPositionX) / 100, (planetVelocityY - planetPositionY) / 100, rad, mas * 10));
+        }
+    }
 
-(function init() {
+    (function start() {
+        return setInterval(nextFrame, 10);
+    })();
 
-    canvas = document.getElementById("myCanvas");
-    ctx = canvas.getContext("2d");
-    canvas.setAttribute('width', WIDTH);
-    canvas.setAttribute('height', HEIGHT);
-    canvas.style.backgroundImage = "url('images/andromeda.jpg')";
-    canvas.addEventListener("mousedown", addPlanet, false);
+    function nextFrame() {
+        planetarium.ctx.clear();
 
-    var x = 0;
-    var y = 0;
-    
-    var x2 = 0;
-    var y2 = 0;
-
-    function addPlanet(event) {
-        if (x === 0 || y === 0) {
-            x = event.clientX - canvas.offsetLeft;
-            y = event.clientY - canvas.offsetTop;
-        } else if (x !== 0 || y !== 0) {
-            x2 = event.clientX - canvas.offsetLeft;
-            y2 = event.clientY - canvas.offsetTop;
-
-            var rad = document.getElementById("radius").value;
-            var mas = document.getElementById("mass").value;
-            
-            var radiusParagraph = document.getElementById("numericRadius");
-            var massParagraph = document.getElementById("numericMass");
-
-            if (rad > 0 && mas > 0) {
-                planetArray.push(new Planet(x, y, (x2 - x) / 100, (y2 - y) / 100, rad, mas * 10));
-                radiusParagraph.innerHTML = rad + ' thousand kilometer';
-                massParagraph.innerHTML = mas + '0 000 000 000 000 000 000 tons';
-            } else {
-                radiusParagraph.innerHTML = 'enter number';
-                massParagraph.innerHTML = 'enter number';
+        for (var i = 0; i < planetarium.planetArray.length; i++) {
+            for (var j = i; j < planetarium.planetArray.length - 1; j++) {
+                planetarium.planetArray[i].InteractWithOtherPlanet(planetarium.planetArray[j + 1]);
             }
-            x = 0;
-            y = 0;
-            x2 = 0;
-            y2 = 0;
         }
+
+        planetarium.planetArray.forEach(function (planet) {
+            planet.Update();
+            planet.Draw(planetarium.ctx);
+        })
     }
-
-    return setInterval(draw, 10);
-})();
-
-function draw(e) {
-    clear();
-
-    for (var i = 0; i < planetArray.length; i++) {
-        for (var j = i; j < planetArray.length - 1; j++) {
-            planetArray[i].InteractWithTheOtherPlanets(planetArray[j + 1]);
-        }
-    }
-
-    for (var i = 0; i < planetArray.length; i++) {
-
-        planetArray[i].Update();
-        planetArray[i].Draw();
-    }
-}
-
-function clear() {
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-}
-
+}(app));

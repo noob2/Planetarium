@@ -3,19 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>Planetarium</title>
+    <link rel="stylesheet" type="text/css" href="style/style.css">
 </head>
 <body>
+
 <div id="wrapper">
-    <canvas id="myCanvas">Your browser suck</canvas>
-    <script src="scripts/objects/planet.js"></script>
-    <script src="scripts/engine.js"></script>
-    <link rel="stylesheet" type="text/css" href="style/style.css">
+    <canvas id="space">Your browser suck</canvas>
 </div>
+
 <div id="controlPanel">
-    <input type="text" id="radius" placeholder="Radius Of Planet">
-    <p id="numericRadius"> -/- </p>
-    <input type="text" id="mass" placeholder="Mass Of Planet">
-    <p id="numericMass"> -/- </p>
+    <input type="text" id="radius" placeholder="radius of planet">
+    <p>10<sup>3</sup> km</p>
+    <input type="text" id="mass" placeholder="mass of planet">
+    <p>10<sup>22</sup> kg</p>
 </div>
+
+<script src="bower_components/jquery/dist/jquery.js"></script>
+
+<script src="scripts/initSpace.js"></script>
+<script src="scripts/objects/planet.js"></script>
+<script src="scripts/engine.js"></script>
+
 </body>
 </html>
