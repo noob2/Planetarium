@@ -5,7 +5,7 @@ var app = app || {};
         this.x = planetPositionX;
         this.y = planetPositionY;
 
-        this.x2 = planetNextFrameX - planetPositionX;
+        this.velocityX = planetNextFrameX - planetPositionX;
         this.velocityY = planetNextFrameY - planetPositionY;
 
         this.radius = radius;
@@ -15,7 +15,7 @@ var app = app || {};
     Planet.prototype.Update = function () {
         const ACCELERATION_REDUCTION = 100;
 
-        this.x += this.x2 / ACCELERATION_REDUCTION;
+        this.x += this.velocityX / ACCELERATION_REDUCTION;
         this.y += this.velocityY / ACCELERATION_REDUCTION;
     };
 
@@ -35,11 +35,11 @@ var app = app || {};
             var attractionAmountForSecondPlanet = (planet.mass * GRAVITATY_POWER) / (distance * distance);
 
             if (this.x < planet.x) {
-                planet.x2 -= attractionAmountForFirstPlanet;
-                this.x2 += attractionAmountForSecondPlanet;
+                planet.velocityX -= attractionAmountForFirstPlanet;
+                this.velocityX += attractionAmountForSecondPlanet;
             } else {
-                planet.x2 += attractionAmountForFirstPlanet;
-                this.x2 -= attractionAmountForSecondPlanet;
+                planet.velocityX += attractionAmountForFirstPlanet;
+                this.velocityX -= attractionAmountForSecondPlanet;
             }
 
             if (this.y < planet.y) {
@@ -49,6 +49,8 @@ var app = app || {};
                 planet.velocityY += attractionAmountForFirstPlanet;
                 this.velocityY -= attractionAmountForSecondPlanet;
             }
+        } else { // planets crash
+            
         }
     };
 

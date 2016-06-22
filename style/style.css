@@ -1,23 +1,26 @@
 #space {
+    cursor: crosshair;
     background-image: url("../images/andromeda.jpg");
     background-size: 100% 120%;
-    margin:5px;
-    border:2px solid black;
-    border-radius:25px;
+    margin: 5px;
+    border: 2px solid black;
+    border-radius: 25px;
     display: inline-block;
     float: left;
 }
-#controlPanel{
-    margin:5px;
+
+#controlPanel {
+    margin: 5px;
 
     width: 200px;
     display: inline-block;
-    border:2px solid black;
-    border-radius:25px;
+    border: 2px solid black;
+    border-radius: 25px;
     text-align: center;
 }
-#controlPanel > input{
-    border-radius:8px;
-    margin-top:20px;
+
+#controlPanel > input {
+    border-radius: 8px;
+    margin-top: 20px;
     text-align: center;
 }
