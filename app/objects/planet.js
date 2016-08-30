@@ -29,10 +29,10 @@ var app = app || {};
         var distance = Math.sqrt(Math.pow(this.x - planet.x, 2) + Math.pow(this.y - planet.y, 2));
 
         if (distance > Math.max(this.radius, planet.radius)) {
-            const GRAVITATY_POWER = 6.67428;
+            const GRAVITY_POWER = 6.67428;
 
-            var attractionAmountForFirstPlanet = (this.mass * GRAVITATY_POWER) / (distance * distance);
-            var attractionAmountForSecondPlanet = (planet.mass * GRAVITATY_POWER) / (distance * distance);
+            var attractionAmountForFirstPlanet = (this.mass * GRAVITY_POWER) / (distance * distance);
+            var attractionAmountForSecondPlanet = (planet.mass * GRAVITY_POWER) / (distance * distance);
 
             if (this.x < planet.x) {
                 planet.velocityX -= attractionAmountForFirstPlanet;
@@ -50,7 +50,14 @@ var app = app || {};
                 this.velocityY -= attractionAmountForSecondPlanet;
             }
         } else { // planets crash
-            
+            var totalVolume = 4 / 3 * Math.PI * Math.pow(this.radius, 3) + 4 / 3 * Math.PI * Math.pow(planet.radius, 3);
+            this.mass = parseInt(this.mass) + parseInt(planet.mass);
+            this.radius = 0.62035 * Math.pow(totalVolume, 1 / 3);
+
+            this.velocityX += planet.velocityX * (planet.mass / this.mass)/2;
+            this.velocityY += planet.velocityY * (planet.mass / this.mass)/2;
+
+            planet.mass = 0;
         }
     };
 

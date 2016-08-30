@@ -40,24 +40,14 @@ var app = app || {};
         planetarium.ctx.clear();
 
         planetarium.planetArray.forEach(function (planetA) {
-            planetarium.planetArray.forEach(function (planetB,i) {
+            planetarium.planetArray.forEach(function (planetB, i) {
                 if (planetA !== planetB) {
+                    planetA.InteractWithOtherPlanet(planetB);
 
-                    var distance = Math.sqrt(Math.pow(planetA.x - planetB.x, 2) +
-                        Math.pow(planetA.y - planetB.y, 2));
-
-                    if (distance > Math.max(planetA.radius, planetB.radius)) {
-                        planetA.InteractWithOtherPlanet(planetB);
-                    } else {//crash
-                        var finalVelocityX = (planetA.mass*planetA.velocityX + planetB.mass*planetB.velocityX)/(planetA.velocityX + planetB.velocityX);
-                        var finalVelocityY = (planetA.mass*planetA.velocityY + planetB.mass*planetB.velocityY)/(planetA.velocityY + planetB.velocityY);
-console.log(finalVelocityX,finalVelocityY)
-                        planetA.velocityX = finalVelocityX;
-                        planetA.velocityY = finalVelocityY;
-                        planetA.mass = parseInt(planetA.mass) + parseInt(planetB.mass);
+                    //remove the planet if collided with the other
+                    if (planetB.mass == 0) {
                         planetarium.planetArray.splice(i, 1);
                     }
-
                 }
             });
             planetA.Update();
