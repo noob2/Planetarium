@@ -1,1 +1,1 @@
-This is simple physix based, planetary simulator
+This is simple physics based, planetary simulator
