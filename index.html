@@ -8,21 +8,24 @@
 <body>
 
 <div id="wrapper">
-    <canvas id="space">Your browser suck</canvas>
+    <canvas id="field">Your browser suck</canvas>
 </div>
 
 <div id="controlPanel">
-    <input type="text" id="radius" placeholder="radius of planet" value="35">
+    <input type="text" id="radius" placeholder="radius of planet" value="100">
     <p>10<sup>3</sup> km</p>
-    <input type="text" id="mass" placeholder="mass of planet" value="35">
+    <input type="text" id="mass" placeholder="mass of planet" value="100">
     <p>10<sup>22</sup> kg</p>
+    <p>count</p>
+    <input type="text" id="objectsCount">
+    <button id="clear">Clear</button>
 </div>
 
 <script src="bower_components/jquery/dist/jquery.js"></script>
 
 <script src="app/initSpace.js"></script>
+<script src="app/objects/point.js"></script>
 <script src="app/objects/planet.js"></script>
-<script src="app/objects/arrow.js"></script>
 <script src="app/engine.js"></script>
 
 </body>

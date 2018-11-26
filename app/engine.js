@@ -1,61 +1,79 @@
 var app = app || {};
 
-(function (planetarium) {
-
-    var planetPositionX, planetPositionY, planetNextFrameX, planetNextFrameY, clientX, clientY, doIDrawArrow;
-    const OFFSET = parseInt($('#space').css('marginTop').replace('px', '')) + 10;
-    $('#space').on('mousedown mouseup', function mouseState(event) {
-        $('#space').mousemove(function (event) {
-            clientX = event.clientX - OFFSET;
-            clientY = event.clientY - OFFSET;
-        });
-        if (event.type == "mousedown") {
-            doIDrawArrow = true;
-            planetPositionX = event.clientX - OFFSET;
-            planetPositionY = event.clientY - OFFSET;
-        }
-        else if (event.type == "mouseup") {
-            doIDrawArrow = false;
-            $('#space').unbind('mousemove');
-            planetNextFrameX = event.clientX - OFFSET;
-            planetNextFrameY = event.clientY - OFFSET;
-
-            addPlanet();
-        }
-    });
-
-    function addPlanet() {
-        var rad = $("#radius").val();
-        var mas = $("#mass").val();
-        if (rad > 0 && mas > 0) {
-            planetarium.planetArray.push(new planetarium.Planet(planetPositionX, planetPositionY, planetNextFrameX, planetNextFrameY, rad, mas));
-        }
-    }
+(function (app) {
 
     (function start() {
         return setInterval(nextFrame, 10);
     })();
 
     function nextFrame() {
-        planetarium.ctx.clear();
 
-        planetarium.planetArray.forEach(function (planetA) {
-            planetarium.planetArray.forEach(function (planetB, i) {
+
+        app.planets.forEach(function (planetA) {
+            app.planets.forEach(function (planetB, i) {
                 if (planetA !== planetB) {
-                    planetA.InteractWithOtherPlanet(planetB);
 
-                    //remove the planet if collided with the other
-                    if (planetB.mass == 0) {
-                        planetarium.planetArray.splice(i, 1);
+                    var distance = planetA.position.DistanceTo(planetB.position);
+                    var biggerRadius = Math.max(planetA.radius, planetB.radius);
+
+                    if (distance > biggerRadius) {
+                        planetA.InteractWithOtherPlanet(planetB);
+                    }
+                    else {
+                        planetA.Crash(planetB);
+                        app.planets.splice(i, 1);
                     }
                 }
             });
             planetA.Update();
-            planetA.Draw();
         });
 
+        app.ctx.clear();
+        app.planets.forEach(function (planet) {
+            planet.Draw();
+        });
+
+        $("#objectsCount").val(app.planets.length);
+
         if (doIDrawArrow) {
-            (new planetarium.Arrow(planetPositionX, planetPositionY)).Draw(clientX, clientY);
+            planetPosition.LineTo(client);
         }
     }
+
+    var planetPosition = new app.Point();
+
+    var headingToPosition = new app.Point();
+
+    var client = new app.Point();
+
+    var doIDrawArrow;
+
+    app.$fieldCanvas.on('mousedown mouseup', function (event) {
+        app.$fieldCanvas.mousemove(function (event) {
+            client.x = event.clientX;
+            client.y = event.clientY;
+        });
+        if (event.type === "mousedown") {
+            doIDrawArrow = true;
+            planetPosition.x = event.clientX;
+            planetPosition.y = event.clientY;
+        }
+        else if (event.type === "mouseup") {
+            doIDrawArrow = false;
+            headingToPosition.x = event.clientX;
+            headingToPosition.y = event.clientY;
+
+            //addPlanet
+            var rad = $("#radius").val();
+            var mas = $("#mass").val();
+            if (rad > 0 && mas > 0) {
+                app.planets.push(new app.Planet(planetPosition, headingToPosition, rad, mas));
+            }
+        }
+    });
+
+    $('#clear').on("click", function () {
+        app.planets = [];
+    });
+
 }(app));

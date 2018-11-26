@@ -1,18 +1,18 @@
 var app = app || {};
 
-(function (planetarium) {
-    const WIDTH = 800;
-    const HEIGHT = 800;
+(function (app) {
+    app.$fieldCanvas = $('#field');
 
-    var spaceCanvas = $('#space')[0];
-    spaceCanvas.setAttribute('width', WIDTH);
-    spaceCanvas.setAttribute('height', HEIGHT);
+    var canvasWidth = window.innerWidth;
+    var canvasHeight = window.innerHeight;
 
-    planetarium.ctx = spaceCanvas.getContext("2d");
-    planetarium.planetArray = [];
-    planetarium.arrow = {};
-    
-    planetarium.ctx.clear = function () {
-        planetarium.ctx.clearRect(0, 0, WIDTH, HEIGHT);
+    app.$fieldCanvas[0].setAttribute('width', canvasWidth);
+    app.$fieldCanvas[0].setAttribute('height', canvasHeight);
+
+    app.ctx = app.$fieldCanvas[0].getContext("2d");
+    app.planets = [];
+
+    app.ctx.clear = function () {
+        app.ctx.clearRect(0, 0, canvasWidth, canvasHeight);
     };
 }(app));

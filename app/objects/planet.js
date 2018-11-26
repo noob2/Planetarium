@@ -1,65 +1,54 @@
 var app = app || {};
 
-(function (planetarium) {
-    function Planet(planetPositionX, planetPositionY, planetNextFrameX, planetNextFrameY, radius, mass) {
-        this.x = planetPositionX;
-        this.y = planetPositionY;
+(function (app) {
 
-        this.velocityX = planetNextFrameX - planetPositionX;
-        this.velocityY = planetNextFrameY - planetPositionY;
+    class Planet {
+        constructor(position, headingToPosition, radius, mass) {
+            this.position = new app.Point(position.x, position.y);
+            this.headingToPosition = new app.Point(headingToPosition.x, headingToPosition.y);
+            this.direction = new app.Point(this.headingToPosition.x - this.position.x,
+                this.headingToPosition.y - this.position.y);
 
-        this.radius = radius;
-        this.mass = mass;
-    }
+            this.radius = radius;
+            this.mass = mass;
+        }
 
-    Planet.prototype.Update = function () {
-        const ACCELERATION_REDUCTION = 100;
+        Update() {
+            const speedReduction = 20;
+            this.position.add(this.direction.x / speedReduction, this.direction.y / speedReduction);
 
-        this.x += this.velocityX / ACCELERATION_REDUCTION;
-        this.y += this.velocityY / ACCELERATION_REDUCTION;
-    };
+        };
 
-    Planet.prototype.Draw = function () {
-        planetarium.ctx.beginPath();
-        planetarium.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
-        planetarium.ctx.fill();
-    };
+        Draw() {
+            app.ctx.beginPath();
+            app.ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, true);
+            app.ctx.fill();
+            app.ctx.closePath();
+        };
 
-    Planet.prototype.InteractWithOtherPlanet = function (planet) {
-        var distance = Math.sqrt(Math.pow(this.x - planet.x, 2) + Math.pow(this.y - planet.y, 2));
+        InteractWithOtherPlanet(planet) {
+            var distance = planet.position.DistanceTo(this.position);
+            var thisPlanetStrength = (this.mass * planet.mass) / Math.pow(distance, 2);
+            var otherPlanetStrength = (planet.mass * planet.mass) / Math.pow(distance, 2);
+            var direction = new app.Point(this.position.x - planet.position.x, this.position.y - planet.position.y);
 
-        if (distance > Math.max(this.radius, planet.radius)) {
-            const GRAVITY_POWER = 6.67428;
+            planet.direction.add(direction.x * thisPlanetStrength, direction.y * thisPlanetStrength);
+            this.direction.add(-direction.x * otherPlanetStrength, -direction.y * otherPlanetStrength);
 
-            var attractionAmountForFirstPlanet = (this.mass * GRAVITY_POWER) / (distance * distance);
-            var attractionAmountForSecondPlanet = (planet.mass * GRAVITY_POWER) / (distance * distance);
 
-            if (this.x < planet.x) {
-                planet.velocityX -= attractionAmountForFirstPlanet;
-                this.velocityX += attractionAmountForSecondPlanet;
-            } else {
-                planet.velocityX += attractionAmountForFirstPlanet;
-                this.velocityX -= attractionAmountForSecondPlanet;
-            }
+        };
+        Crash(planet){
+            var massMultiplyer = this.mass*planet.mass;
 
-            if (this.y < planet.y) {
-                planet.velocityY -= attractionAmountForFirstPlanet;
-                this.velocityY += attractionAmountForSecondPlanet;
-            } else {
-                planet.velocityY += attractionAmountForFirstPlanet;
-                this.velocityY -= attractionAmountForSecondPlanet;
-            }
-        } else { // planets crash
+            this.direction.x = (this.direction.x*this.mass + planet.direction.x*planet.mass)/massMultiplyer;
+            this.direction.y = (this.direction.y*this.mass + planet.direction.y*planet.mass)/massMultiplyer;
+
             var totalVolume = 4 / 3 * Math.PI * Math.pow(this.radius, 3) + 4 / 3 * Math.PI * Math.pow(planet.radius, 3);
             this.mass = parseInt(this.mass) + parseInt(planet.mass);
             this.radius = 0.62035 * Math.pow(totalVolume, 1 / 3);
 
-            this.velocityX += planet.velocityX * (planet.mass / this.mass)/2;
-            this.velocityY += planet.velocityY * (planet.mass / this.mass)/2;
-
-            planet.mass = 0;
         }
-    };
+    }
 
-    planetarium.Planet = Planet;
+    app.Planet = Planet;
 }(app));
