@@ -1,0 +1,19 @@
+{
+  "name": "planetarium",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noob2/Planetarium.git"
+  },
+  "author": "viksata proto",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/noob2/Planetarium/issues"
+  },
+  "homepage": "https://github.com/noob2/Planetarium#readme"
+}
