@@ -40,8 +40,8 @@ canvas.addEventListener('mouseup', e => {
       doIDraw = false
       canvas.removeEventListener('mousemove', drawLine, false)
       objects.push({
-         radius: document.getElementById('radius').value,
-         mass: document.getElementById('mass').value,
+         radius: parseInt(document.getElementById('radius').value),
+         mass: parseInt(document.getElementById('mass').value),
          x: (e.clientX + offset.x) / zoom,
          y: (e.clientY + offset.y) / zoom,
          xSpeed: (currentPosition.x - startPosition.x) / 20,
@@ -58,16 +58,32 @@ canvas.addEventListener('wheel', e => {
 })
 setInterval(() => {
    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
-   for (let i = 0; i < objects.length; i++) {
+
+   for (const i in objects) {
       let o = objects[i]
-      for (let j = 0; j < objects.length; j++) {
+      for (const j in objects) {
          if (i != j) {
             let o2 = objects[j]
-            let distance = Math.pow(o.x - o2.x, 2) + Math.pow(o.y - o2.y, 2)
-            if (distance > o2.radius / 2 + o.radius / 2) {
-               let gravity = (o.mass / distance) * 1000
-               o2.xSpeed += o.x - o2.x > 0 ? gravity : -gravity
-               o2.ySpeed += o.y - o2.y > 0 ? gravity : -gravity
+            let distanceSquared = Math.pow(o.x - o2.x, 2) + Math.pow(o.y - o2.y, 2)
+            if (Math.sqrt(distanceSquared) > o2.radius + o.radius) {
+               let gravity = o.mass / distanceSquared
+               o.xSpeed += gravity * ((o2.x - o.x) / (o2.y - o.y))
+               o2.xSpeed += gravity * ((o.x - o2.x) / (o2.y - o.y))
+               //sinA = ? (90deg == 1)
+
+               //          c
+               // -------------------
+               //    -              |
+               //        -          | b
+               //        a    -     |
+               //                 - |
+
+               // o.ySpeed += (gravity * (o.x - o2.x)) / (o.y - o2.y)
+               //  console.log(o.x - o2.x > 0 ? gravity : -gravity)
+               //  let gravity2 = o2.mass / distanceSquared
+
+               //  o2.xSpeed += o.x  - o2.x > 0 ? gravity2 : -gravity2
+               //  o2.ySpeed += o.y - o2.y > 0 ? gravity2 : -gravity2
             }
          }
       }
