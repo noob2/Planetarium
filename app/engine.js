@@ -11,78 +11,84 @@ canvas.addEventListener('contextmenu', e => e.preventDefault())
 
 let startPosition = { x: 0, y: 0 }
 let currentPosition = { x: 0, y: 0 }
-function mouseMoveHandler(e) {
-  currentPosition = { x: e.clientX, y: e.clientY }
-  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
-  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
-  ctx.beginPath()
-  ctx.moveTo(startPosition.x, startPosition.y)
-  ctx.lineTo(currentPosition.x, currentPosition.y)
-  ctx.stroke()
-  ctx.closePath()
+let offset = { x: -window.innerWidth / 2, y: -window.innerHeight / 2 }
+
+let doIDraw = false
+function drawLine(e) {
+   currentPosition = { x: e.clientX, y: e.clientY }
 }
-let offset = { x: 0, y: 0 }
+
+function dragOffset(e) {
+   offset.x += currentPosition.x - e.clientX
+   offset.y += currentPosition.y - e.clientY
+   currentPosition.x = e.clientX
+   currentPosition.y = e.clientY
+}
+
 canvas.addEventListener('mousedown', e => {
-  startPosition = { x: e.clientX, y: e.clientY }
-  currentPosition = { x: e.clientX, y: e.clientY }
-  canvas.addEventListener('mousemove', mouseMoveHandler, false)
-  if (e.button == 0) {
-  }
+   startPosition = { x: e.clientX, y: e.clientY }
+   currentPosition = { x: e.clientX, y: e.clientY }
+   if (e.button == 0) {
+      doIDraw = true
+      canvas.addEventListener('mousemove', drawLine, false)
+   } else {
+      canvas.addEventListener('mousemove', dragOffset, false)
+   }
 })
 canvas.addEventListener('mouseup', e => {
-  canvas.removeEventListener('mousemove', mouseMoveHandler, false)
-  if (e.button == 0) {
-    objects.push({
-      radius: document.getElementById('radius').value,
-      mass: document.getElementById('mass').value,
-      x: (e.clientX + offset.x) / zoom,
-      y: (e.clientY + offset.y) / zoom
-    })
-  } else if (e.button == 2) {
-    offset.x += startPosition.x - e.clientX
-    offset.y += startPosition.y - e.clientY
-  }
+   if (e.button == 0) {
+      doIDraw = false
+      canvas.removeEventListener('mousemove', drawLine, false)
+      objects.push({
+         radius: document.getElementById('radius').value,
+         mass: document.getElementById('mass').value,
+         x: (e.clientX + offset.x) / zoom,
+         y: (e.clientY + offset.y) / zoom,
+         xSpeed: (currentPosition.x - startPosition.x) / 20,
+         ySpeed: (currentPosition.y - startPosition.y) / 20
+      })
+   } else {
+      canvas.removeEventListener('mousemove', dragOffset, false)
+   }
 })
 canvas.addEventListener('wheel', e => {
-  let direction = e.deltaY > 0 ? 'down' : 'up'
-  direction == 'down' ? (zoom *= 2) : (zoom /= 2)
-  document.getElementById('zoom').value = zoom
+   let direction = e.deltaY > 0 ? 'down' : 'up'
+   direction == 'down' ? (zoom *= 2) : (zoom /= 2)
+   document.getElementById('zoom').value = zoom
 })
-;(() =>
-  setInterval(() => {
-    objects.forEach(o => {
+setInterval(() => {
+   ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
+   for (let i = 0; i < objects.length; i++) {
+      let o = objects[i]
+      for (let j = 0; j < objects.length; j++) {
+         if (i != j) {
+            let o2 = objects[j]
+            let distance = Math.pow(o.x - o2.x, 2) + Math.pow(o.y - o2.y, 2)
+            if (distance > o2.radius / 2 + o.radius / 2) {
+               let gravity = (o.mass / distance) * 1000
+               o2.xSpeed += o.x - o2.x > 0 ? gravity : -gravity
+               o2.ySpeed += o.y - o2.y > 0 ? gravity : -gravity
+            }
+         }
+      }
+      o.x += o.xSpeed
+      o.y += o.ySpeed
       ctx.beginPath()
       ctx.arc(o.x * zoom - offset.x, o.y * zoom - offset.y, o.radius * zoom, 0, Math.PI * 2, true)
       ctx.fillStyle = '#fff'
       ctx.fill()
       ctx.closePath()
-    })
-  }, 60))()
+   }
 
-// function clear() {
-//   ctx.clearRect(0, 0, window.innerWidth, window.innerHeight)
-// }
-// //point
-// class Point {
-//   constructor(x, y) {
-//     this.x = x
-//     this.y = y
-//   }
-
-//   LineTo(point) {
-//     ctx.beginPath()
-//     ctx.moveTo(this.x, this.y)
-//     ctx.lineTo(point.x, point.y)
-//     ctx.stroke()
-//   }
-//   DistanceTo(point) {
-//     return Math.sqrt(Math.pow(this.x - point.x, 2) + Math.pow(this.y - point.y, 2))
-//   }
-//   add(x, y) {
-//     this.x += x
-//     this.y += y
-//   }
-// }
+   if (doIDraw) {
+      ctx.beginPath()
+      ctx.moveTo(startPosition.x, startPosition.y)
+      ctx.lineTo(currentPosition.x, currentPosition.y)
+      ctx.stroke()
+      ctx.closePath()
+   }
+}, 60)
+//60
 
 // //planet
 // class Planet {
@@ -95,18 +101,6 @@ canvas.addEventListener('wheel', e => {
 //     )
 //     this.radius = radius
 //     this.mass = mass
-//   }
-
-//   Update() {
-//     const speedReduction = 20
-//     this.position.add(this.direction.x / speedReduction, this.direction.y / speedReduction)
-//   }
-
-//   Draw() {
-//     ctx.beginPath()
-//     ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, true)
-//     ctx.fill()
-//     ctx.closePath()
 //   }
 
 //   InteractWithOtherPlanet(planet) {
